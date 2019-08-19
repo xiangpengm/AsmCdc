@@ -42,9 +42,10 @@ def gene_index():
     r = Template.render("templates/template.html", 
         raw_js=load("templates/raw.js"),
         raw_css=load("templates/raw.css"),
+        pure_css=load("templates/pure-min.css"),
     )
-    # save('templates/index.html', r)
     page = Template.render("templates/page.py", p=r)
+    save('templates/index.html', r)
     save('page.py', page)
 
 
