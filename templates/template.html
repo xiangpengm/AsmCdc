@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <style>
+        {{raw_css}}
+    </style>
+</head>
+
+<body>
+    <h1>JS API Example</h1>
+    
+    <!-- btn1 -->
+    <div>
+    <button onClick="initialize()">Hello Python</button><br />
+    </div>
+    
+    <!-- btn2 -->
+    <div>
+    <button id="heavy-stuff-btn" onClick="doHeavyStuff()">Perform a heavy operation</button><br />
+    </div>
+
+    <!-- btn3 -->
+    <div>
+    <button onClick="getRandomNumber()">Get a random number</button>
+    </div>
+    
+    <!-- btn4 -->
+    <div>
+    <label for="name_input">Say hello to:</label>
+    <input id="name_input" placeholder="put a name here">
+    <button onClick="greet()">Greet</button><br />
+    </div>
+
+    <div>
+        <button onclick="getFile()">选择文件</button>
+    </div>
+    
+    <div>
+        <button onclick="saveFile()">选择文件</button>
+    </div>
+    <!-- 容器 -->
+    <div id="response-container">
+    </div>
+    <script>
+        {{raw_js}}
+    </script>
+</body>
+
+</html>
