@@ -102,3 +102,8 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+.test
+pure-layout-marketing/
+templates/index.html
+pure-layout-marketing.zip
+test/

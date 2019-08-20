@@ -1,67 +1,105 @@
-import threading
-import time
+# 
+import os
 import sys
+import time
 import random
-from package import Template, load
 import webview
+import threading
+from hashlib import md5
+import asyncio
+
+# 
 from page import html
+
+
+class Global(object):
+    total = 0
+    current = 0
+    mutex = threading.Lock()
+
+    @classmethod
+    def setTotal(cls, value):
+        cls.mutex.acquire()
+        cls.total = value
+        cls.mutex.release()
+
+    @classmethod
+    def addCurrent(cls):
+        cls.mutex.acquire()
+        cls.current += 1
+        cls.mutex.release()
+    
+    @classmethod
+    def reset(cls):
+        cls.mutex.acquire()
+        cls.total = 0
+        cls.current = 0
+        cls.mutex.release()
 
 
 class Api:
     def __init__(self):
-        self.cancel_heavy_stuff_flag = False
+        self.itemList = []
 
-    def init(self, params):
-        response = {
-            'message': 'Hello from Python {0}'.format(sys.version)
-        }
-        return response
-
-    def getRandomNumber(self, params):
-        response = {
-            'message': 'Here is a random number courtesy of randint: {0}'.format(random.randint(0, 100000000))
-        }
-        return response
-
-    def doHeavyStuff(self, params):
-        # sleep to prevent from the ui thread from freezing for a moment
-        time.sleep(0.1)
-        now = time.time()
-        self.cancel_heavy_stuff_flag = False
-        for i in range(0, 1000000):
-            _ = i * random.randint(0, 1000)
-            if self.cancel_heavy_stuff_flag:
-                response = {'message': 'Operation cancelled'}
-                break
+    def getCount(self, params):
+        if Global.total == 0:
+            return "noTask"
+        elif Global.current == Global.total:
+            Global.reset()
+            return 1
         else:
-            then = time.time()
-            response = {
-                'message': 'Operation took {0:.1f} seconds on the thread {1}'.format((then - now), threading.current_thread())
-            }
-        return response
+            return Global.current/Global.total
 
-    def cancelHeavyStuff(self, params):
-        time.sleep(0.1)
-        self.cancel_heavy_stuff_flag = True
-
-    def sayHelloTo(self, params):
-        response = {
-            'message': 'Hello {0}!'.format(params)
-        }
-        return response
-
-    def getFile(self, params):
-        file_types = ('Image Files (*.bmp;*.jpg;*.gif)', 'All files (*.*)')
+    def getFilePath(self, params):
         result = window.create_file_dialog(
-            webview.OPEN_DIALOG, 
+            webview.FOLDER_DIALOG,
             allow_multiple=True,
-            file_types=file_types
         )
         if result is None:
             return {"message": "error"}
         else:
-            return {"message": result}
+            # 重置
+            Global.reset()
+            fileList = []
+            total = 0
+            for f in os.listdir(result[0]):
+                if f.endswith('.gz'):
+                    filePath = os.path.join(result[0], f)
+                    fileList.append((f, filePath))
+                    total += 1
+            Global.setTotal(total)
+            for f, filePath in fileList:
+                t = threading.Thread(target=self.getFileMD5, args=(filePath, ))
+                t.start()
+            return [result[0], total]
 
+    def getOutputPath(self, params):
+        result = window.create_file_dialog(
+            webview.FOLDER_DIALOG,
+            allow_multiple=True,
+        )
+        if result is None:
+            return {"message": "error"}
+        else:
+            return result[0]
+
+    def getFileData(self, param):
+        return self.itemList
+
+    def getFileMD5(self, file):  # check大文件的MD5值
+        print('start thread', file)
+        m = md5()
+        f = open(file, 'rb')
+        buffer = 8192    # why is 8192 | 8192 is fast than 2048
+        while 1:
+            chunk = f.read(buffer)
+            if not chunk:
+                break
+            m.update(chunk)
+        f.close()
+        Global.addCurrent()
+        print(file, m.hexdigest(), 'done')
+        self.itemList.append((file, m.hexdigest()))
 
 
 if __name__ == '__main__':
@@ -70,6 +108,6 @@ if __name__ == '__main__':
         'CDC Assembly Client', 
         html=html, 
         js_api=api,
-        min_size=(500, 400)
+        min_size=(720, 480)
     )
     webview.start()

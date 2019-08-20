@@ -3,89 +3,70 @@
 
 <head lang="en">
     <meta charset="UTF-8">
+    <!--  -->
     <style>
+        {{alertify_css}}
+        {{default_css}}
+        {{semantic_css}}
+        {{bootstrap_css}}
         {{ pure_css }}
-    </style>
-    <style>
         {{raw_css}}
     </style>
+    <!--  -->
     <script>
-        {{ bootstrap_table_js }}
+        {{table_js}}
+        {{ nanobar_js }}
+        {{ alertify_js }}
+        {{ progressbar_js }}
     </script>
 </head>
 
 <body>
-    <h1>JS API Example</h1>
-    
-    <!-- btn1 -->
-    <div>
-    <button onClick="initialize()">Hello Python</button><br />
-    </div>
-    
-    <!-- btn2 -->
-    <div>
-    <button id="heavy-stuff-btn" onClick="doHeavyStuff()">Perform a heavy operation</button><br />
-    </div>
-
-    <!-- btn3 -->
-    <div>
-    <button onClick="getRandomNumber()">Get a random number</button>
-    </div>
-    
-    <!-- btn4 -->
-    <div>
-    <label for="name_input">Say hello to:</label>
-    <input id="name_input" placeholder="put a name here">
-    <button onClick="greet()">Greet</button><br />
+    <!-- pure template -->
+    <div class="header">
+        <div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
+            <a class="pure-menu-heading" href="#">CDC ASM Client</a>
+            <ul class="pure-menu-list">
+                <li class="pure-menu-item"><a href="#" id="gua-a-selector-directory-input" class="pure-menu-link">选择输入目录</a></li>
+                <li class="pure-menu-item"><a href="#" id="gua-a-selector-directory-output" class="pure-menu-link">选择输出目录</a></li>
+            </ul>
+        </div>
     </div>
 
-    <div>
-        <button onclick="getFile()">选择文件</button>
-    </div>
-    
-    <div>
-        <button onclick="saveFile()">选择文件</button>
-    </div>
-    <!-- 容器 -->
-    <div id="response-container">
+    <div class="splash-container">
+        <div class="splash">
+            <p>
+                <a href="#" class="pure-button pure-button-primary">Get Started</a>
+            </p>
+            <!-- <h1 class="splash-head">Big Bold Text</h1>
+            <p class="splash-subhead">
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+            </p> -->
+            <div id="progressbar" >
+                
+            </div>
+
+        </div>
     </div>
 
-    <table class="pure-table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Make</th>
-                    <th>Model</th>
-                    <th>Year</th>
-                </tr>
-            </thead>
-        
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Honda</td>
-                    <td>Accord</td>
-                    <td>2009</td>
-                </tr>
-        
-                <tr>
-                    <td>2</td>
-                    <td>Toyota</td>
-                    <td>Camry</td>
-                    <td>2012</td>
-                </tr>
-        
-                <tr>
-                    <td>3</td>
-                    <td>Hyundai</td>
-                    <td>Elantra</td>
-                    <td>2010</td>
-                </tr>
-            </tbody>
-        </table>
+
+    <div class="content-wrapper"> 
+        <!-- log日志 --> 
+        <div  id="gua-div-terminal" style="margin: 5%; border: 1px solid">
+
+        </div>
+        <!-- 容器 -->
+        <div id="gua-response-container" style="margin: 5%; border: 1px solid">
+        </div>
+    </div>
+
+    <div id="gua-div-id-label">
+        <p>当前任务的数据目录是:&nbsp;<span id="gua-id-span-input-path"></span></p>
+        <p>当前任务的输出目录是:&nbsp;<span id="gua-id-span-output-path"></span></p>
+    </div>
+    <!-- 主脚本 -->
     <script>
         {{raw_js}}
     </script>
 </body>
-
 </html>

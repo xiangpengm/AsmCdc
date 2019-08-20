@@ -40,9 +40,20 @@ def save(file, data):
 
 def gene_index():
     r = Template.render("templates/template.html", 
-        raw_js=load("templates/raw.js"),
-        raw_css=load("templates/raw.css"),
-        pure_css=load("templates/pure-min.css"),
+        # js
+        raw_js=load("templates/js/raw.js"),
+        table_js=load("templates/js/table.js"),
+        alertify_js=load("templates/js/alertify.min.js"),
+        progressbar_js=load("templates/js/progressbar.js"),
+        # css
+        raw_css=load("templates/css/raw.css"),
+        pure_css=load("templates/css/pure-min.css"),
+        #  css alertify
+        alertify_css=load("templates/css/alertify.min.css"),
+        default_css=load("templates/css/default.min.css"),
+        semantic_css=load("templates/css/semantic.min.css"),
+        bootstrap_css=load("templates/css/bootstrap.min.css"),
+
     )
     page = Template.render("templates/page.py", p=r)
     save('templates/index.html', r)
