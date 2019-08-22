@@ -3,7 +3,8 @@ const g = {
     // input
     inputPath: '',
     outputPath: '',
-
+    getFile: false,
+    fileData: [],
 }
 
 var log = function(...arguments){
@@ -13,29 +14,70 @@ var log = function(...arguments){
     let line = arguments.join(' ')
     g.log.push(line)
     let s = g.log.join('<br>') 
-    s = s + '<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>'
+    s = s + '<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>'
     ter.innerHTML = s
 }
 
-function getFileData() {
+function drawTable(container, data){
+    log("start call draw table func", container)
+        $(container).prepend(`
+        <table id="table" 
+        data-page-size="4"   
+        data-pagination="true"
+        >
+        <thead>
+        <tr>
+        <th data-field="id">ID</th>
+        <th data-field="name">Item Name</th>
+        <th data-field="hash">Item Hash</th>
+        </tr>
+        </thead>
+        </table>
+    `) 
+    log("table draw table func")
+    let $table = $('#table')
+    log("draw draw table func")
+    $table.bootstrapTable({ data: data })
+    $(container).append(`
+        <p>
+            <a id="gua-button-start" href="#" class="pure-button pure-button-primary">Start Task</a>
+        </p>
+    `)
+
+    log("end draw table func")
+}
+
+
+function getFileData(callback) {
     pywebview.api.getFileData().then(function (response) {
-        
+        drawTable("#gua-div-table-container", response)
+        callback()
     })
 }
 
 function getFilePath(){
     // 选择数据目录
-    pywebview.api.getFilePath().then((response,  count)=>{
-        alertify.alert("输入目录已选择")
-        log('response', `(${response})`)
-        g.inputPath = response
-        // 替换现有的当前任务输入目录
-        let s = document.querySelector('#gua-id-span-input-path')
-        s.innerHTML = response
-        if (count == 0) {
-            alertify.error("目录找不到对应文件")
+    pywebview.api.getFilePath().then((params)=>{
+        log('response', `(${params.path})`, params.total)
+        if (params == "None") {
+            alertify.error("未选择目录, 请重新选择目录", 2)
+        }else if (params.total == 0) {
+            alertify.error("目录找不到对应文件, 请重新选择目录", 2)
         } else{
-            getCountBar("#progressbar")
+            g.getFile = true
+            g.inputPath = params.path
+            // 替换现有的当前任务输入目录
+            let s = document.querySelector('#gua-id-span-input-path')
+            s.innerHTML = params.path
+            alertify.alert("CDC ASM Client", "输入目录已选择")
+            getCountBar("#progressbar", function () {
+                // 获取数据
+                getFileData(function(){
+                    if (g.inputPath !== '' && g.outputPath !== '') {
+                        alertify.message("配置加载完毕, 请开始任务", 2)
+                    }
+                })
+            })
         }
     })
     // 数据加载进度条
@@ -43,16 +85,27 @@ function getFilePath(){
 
 function getOutputPath(){
     pywebview.api.getOutputPath().then((response)=>{
-        alertify.alert("输出目录已选择")
-        g.outputPath = response
-        // 替换现有的当前任务输入目录
-        let s = document.querySelector('#gua-id-span-output-path')
-        s.innerHTML = response
+        if (response == 'None') {
+            alertify.error("未选择输出目录, 请重新选择目录", 2)
+        } else if(g.getFile == true){
+            alertify.error("等待输入目录数据加载完成", 2)
+        } else {
+            g.outputPath = response
+            // 替换现有的当前任务输入目录
+            let s = document.querySelector('#gua-id-span-output-path')
+            s.innerHTML = response
+            alertify.alert("输出目录已选择", function(){                
+                if (g.inputPath !== '' && g.outputPath !== '') {
+                    alertify.message("配置加载完毕, 请开始任务", 500)
+                }
+            })
+        }
     })
 }
 
 function bindEvent(selector, callback) {
     //给一个按钮绑定事件
+    log("bind Event", selector)
     let b = document.querySelector(selector)
     b.addEventListener('click', callback)
 }
@@ -60,17 +113,24 @@ function bindEvent(selector, callback) {
 function bar(parent){
     // progressbar.js@1.0.0 version is used
     // Docs: http://progressbarjs.readthedocs.org/en/1.0.0/
+    // 删除原来表格
+    if ($("#table").length > 0){
+        let $table = $("#table")
+        $table.bootstrapTable("removeAll")
+        $table.bootstrapTable("destroy")
+        $table.remove()
+    }
+    if ($("#gua-button-start").length > 0) {
+        $("#gua-button-start").remove()
+    }
     let parentID = parent.slice(1, parent.length)
     let containerID = `${parentID}-container`
     let parentDoc = document.querySelector(parent)
-    log(parent)
-    log(containerID)
     let html = `
     <div id="${containerID}" class="container"></div>
     `
     parentDoc.insertAdjacentHTML('beforeend', html)
     let container = document.querySelector(`${parent}-container`)
-    log(container)
     let bar = new ProgressBar.Circle(container, {
         color: '#333',
         // This has to be the same size as the maximum width to
@@ -90,7 +150,7 @@ function bar(parent){
             circle.path.setAttribute('stroke-width', state.width);
             var value = Math.round(circle.value() * 100);
             if (value === 0) {
-                circle.setText('');
+                circle.setText('loading');
             } else {
                 circle.setText(value + '%');
             }
@@ -100,27 +160,7 @@ function bar(parent){
     return bar
 }
 
-
-function pBar() {
-    let parentID = '#progressbar'
-    let b = bar(parentID)
-    let duration = 100
-    let intervalID = setInterval(function(){
-        pywebview.api.getCount().then(function(response){
-            if (response == "hasEnd") {
-                clearInterval(intervalID)
-                setTimeout(() => {
-                    b.destroy()
-                    // 显示表格
-                }, 1000);
-            } else{
-              b.animate(response, {duration: duration})
-            }
-        })
-    }, duration)
-}
-
-function getCountBar(parentSelector) {
+function getCountBar(parentSelector, callback) {
     // 显示数据的bar
     let parentID = parentSelector
     let b = bar(parentID)
@@ -128,12 +168,16 @@ function getCountBar(parentSelector) {
     let intervalID = setInterval(function () {
         pywebview.api.getCount().then(function (response) {
             if (response == "noTask") {
-                return
+                
             } else if (response == 1.0) {
                 clearInterval(intervalID)
                 b.animate(response, { duration: duration })
                 setTimeout(() => {
                     b.destroy()
+                    g.getFile = false
+                    let s = document.querySelector(parentID)
+                    s.innerHTML = ''
+                    callback()
                     // 显示表格
                 }, 1000);
             } else {
@@ -146,13 +190,15 @@ function getCountBar(parentSelector) {
 
 function main() {
     log("start main function")
-    // 给input按钮绑定事件，打开文件
+    alertify.defaults.glossary.title = "CDC ASM Client"
+    // // 给input按钮绑定事件，打开文件
     bindEvent("#gua-a-selector-directory-input", function(){
         getFilePath()
     })
     bindEvent("#gua-a-selector-directory-output", function () {
         getOutputPath()
     })
+    log("end main function")
 }
 
 main()

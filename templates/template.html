@@ -4,21 +4,9 @@
 <head lang="en">
     <meta charset="UTF-8">
     <!--  -->
-    <style>
-        {{alertify_css}}
-        {{default_css}}
-        {{semantic_css}}
-        {{bootstrap_css}}
-        {{ pure_css }}
-        {{raw_css}}
-    </style>
-    <!--  -->
-    <script>
-        {{table_js}}
-        {{ nanobar_js }}
-        {{ alertify_js }}
-        {{ progressbar_js }}
-    </script>
+    {% for css in csss%}
+    <style> {{css}} </style>
+    {% endfor %}
 </head>
 
 <body>
@@ -35,17 +23,11 @@
 
     <div class="splash-container">
         <div class="splash">
-            <p>
-                <a href="#" class="pure-button pure-button-primary">Get Started</a>
-            </p>
-            <!-- <h1 class="splash-head">Big Bold Text</h1>
-            <p class="splash-subhead">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-            </p> -->
-            <div id="progressbar" >
-                
-            </div>
+            <div id="gua-div-table-container" >        
 
+            </div>
+            <div id="progressbar" >             
+            </div>
         </div>
     </div>
 
@@ -64,9 +46,8 @@
         <p>当前任务的数据目录是:&nbsp;<span id="gua-id-span-input-path"></span></p>
         <p>当前任务的输出目录是:&nbsp;<span id="gua-id-span-output-path"></span></p>
     </div>
-    <!-- 主脚本 -->
-    <script>
-        {{raw_js}}
-    </script>
+    {% for s in scripts %}
+        <script> {{ s }} </script>
+    {% endfor %}
 </body>
 </html>

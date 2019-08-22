@@ -1,4 +1,3 @@
-# 
 import os
 import sys
 import time
@@ -8,8 +7,12 @@ import threading
 from hashlib import md5
 import asyncio
 
-# 
-from page import html
+import json
+
+
+def load(file, tp='r'):
+    with open(file, tp) as f:
+        return f.read()
 
 
 class Global(object):
@@ -38,6 +41,7 @@ class Global(object):
 
 
 class Api:
+
     def __init__(self):
         self.itemList = []
 
@@ -56,7 +60,7 @@ class Api:
             allow_multiple=True,
         )
         if result is None:
-            return {"message": "error"}
+            return "None"
         else:
             # 重置
             Global.reset()
@@ -68,10 +72,14 @@ class Api:
                     fileList.append((f, filePath))
                     total += 1
             Global.setTotal(total)
+            self.resetItemList()
             for f, filePath in fileList:
                 t = threading.Thread(target=self.getFileMD5, args=(filePath, ))
                 t.start()
-            return [result[0], total]
+            return {
+                "path": result[0], 
+                "total": total
+            }
 
     def getOutputPath(self, params):
         result = window.create_file_dialog(
@@ -79,18 +87,26 @@ class Api:
             allow_multiple=True,
         )
         if result is None:
-            return {"message": "error"}
+            return "None"
         else:
             return result[0]
 
     def getFileData(self, param):
-        return self.itemList
+        print("itemlist:", self.itemList)
+        r = []
+        for index, cell in enumerate(self.itemList):
+            item = {
+                "id": index+1,
+                "name": os.path.basename(cell[0]),
+                "hash": cell[1],
+            }
+            r.append(item)
+        return json.dumps(r, ensure_ascii=False)
 
     def getFileMD5(self, file):  # check大文件的MD5值
-        print('start thread', file)
         m = md5()
         f = open(file, 'rb')
-        buffer = 8192    # why is 8192 | 8192 is fast than 2048
+        buffer = 8192
         while 1:
             chunk = f.read(buffer)
             if not chunk:
@@ -98,16 +114,18 @@ class Api:
             m.update(chunk)
         f.close()
         Global.addCurrent()
-        print(file, m.hexdigest(), 'done')
         self.itemList.append((file, m.hexdigest()))
+
+    def resetItemList(self):
+        self.itemList = []
 
 
 if __name__ == '__main__':
     api = Api()
     window = webview.create_window(
         'CDC Assembly Client', 
-        html=html, 
+        html=load("templates/index.html"), 
         js_api=api,
-        min_size=(720, 480)
+        min_size=(960, 720)
     )
     webview.start()

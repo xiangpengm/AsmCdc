@@ -5,37 +5,113 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Hello, Bootstrap Table!</title>
-    <link rel="stylesheet" href="https://cdn.bootcss.com/twitter-bootstrap/4.2.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.15.4/dist/bootstrap-table.min.css">
+    {% for css in csss%}
+    <style> {{css}} </style>
+    {% endfor %}
   </head>
-  <body>
-    <table data-toggle="table">
-      <thead>
-        <tr>
-          <th>Item ID</th>
-          <th>Item Name</th>
-          <th>Item Price</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1</td>
-          <td>Item 1</td>
-          <td>$1</td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>Item 2</td>
-          <td>$2</td>
-        </tr>
-      </tbody>
-    </table>
+  <body >
+    <div id="gua-div-table-container">
+      
+    </div>
+    <button id="btn">Hello</button>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
-    <script src="https://cdn.bootcss.com/twitter-bootstrap/4.2.1/js/bootstrap.min.js"></script>
-    <script src="https://unpkg.com/bootstrap-table@1.15.4/dist/bootstrap-table.min.js"></script>
-  </body>
+    {% for s in scripts %}
+      <script> {{ s }} </script>
+    {% endfor %}
+    <script>
+        // function bindEvent(selector, callback) {
+        //   //给一个按钮绑定事件
+        //   let b = document.querySelector(selector)
+        //   b.addEventListener('click', callback)
+        // }
+
+
+        function drawTable(container, data){
+          $(container).append(`
+              <table id="table" 
+                  data-page-size="2"   
+                  data-pagination="true"
+              >
+                <thead>
+                  <tr>
+                    <th data-field="id">ID</th>
+                    <th data-field="name">Item Name</th>
+                    <th data-field="hash">Item Hash</th>
+                  </tr>
+                </thead>
+              </table>
+            `)  
+          let $table = $('#table')
+          $table.bootstrapTable({ 
+            data: data, 
+            pageSize: 2 
+          })
+        }
+        let data = [
+            {
+              id: 0,
+              name: "wang",
+              hash: "1",
+            },
+            {
+            id: 1,
+            name: "wang",
+            hash: "1",
+            },   
+          {
+            id: 2,
+            name: "wang",
+            hash: "1",
+          },             {
+            id: 3,
+            name: "wang",
+            hash: "1",
+          },             {
+            id: 4,
+            name: "wang",
+            hash: "1",
+          },             {
+            id: 5,
+            name: "wang",
+            hash: "1",
+          },             {
+            id: 6,
+            name: "wang",
+            hash: "1",
+          },             {
+            id: 7,
+            name: "wang",
+            hash: "1",
+          },             {
+            id: 8,
+            name: "wang",
+            hash: "1",
+          },             {
+            id: 9,
+            name: "wang",
+            hash: "1",
+          },             {
+            id: 10,
+            name: "wang",
+            hash: "1",
+          },             {
+            id: 11,
+            name: "wang",
+            hash: "1",
+          },             {
+            id: 12,
+            name: "wang",
+            hash: "1",
+          },             {
+            id: 13,
+            name: "wang",
+            hash: "1",
+          },        
+
+        ]
+        $("#btn").bind("click", function () {
+            drawTable("#gua-div-table-container", data)
+        })
+        </script>
+  </body> 
 </html>

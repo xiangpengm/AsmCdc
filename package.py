@@ -1,4 +1,5 @@
 import os
+import webview
 from jinja2 import (
     FileSystemLoader,
     Environment)
@@ -39,25 +40,38 @@ def save(file, data):
 
 
 def gene_index():
-    r = Template.render("templates/template.html", 
-        # js
-        raw_js=load("templates/js/raw.js"),
-        table_js=load("templates/js/table.js"),
-        alertify_js=load("templates/js/alertify.min.js"),
-        progressbar_js=load("templates/js/progressbar.js"),
-        # css
-        raw_css=load("templates/css/raw.css"),
-        pure_css=load("templates/css/pure-min.css"),
-        #  css alertify
-        alertify_css=load("templates/css/alertify.min.css"),
-        default_css=load("templates/css/default.min.css"),
-        semantic_css=load("templates/css/semantic.min.css"),
-        bootstrap_css=load("templates/css/bootstrap.min.css"),
+    csss = [
+        # # bootstrap
+        load("templates/css/bootstrap.min.css"),
+        load("templates/css/all.css"),
+        # # bootstrap table
+        load("templates/css/bootstrap-table.min.css"),
+        # #  css alertify
+        load("templates/css/alertify.min.css"),
+        load("templates/css/default.min.css"),
+        load("templates/css/semantic.min.css"),
+        load("templates/css/bootstrap.min.css"),
+        # #  pure css
+        load("templates/css/pure-min.css"),
+        # # css
+        load("templates/css/raw.css"),
+    ]
+    scripts = [
+        # 第三方库
+        load("templates/js/jquery-3.3.1.min.js"),
+        load("templates/js/popper.min.js"),
+        load("templates/js/bootstrap.min.js"),
+        load("templates/js/bootstrap-table.min.js"),
+        load("templates/js/alertify.min.js"),
+        load("templates/js/progressbar.js"),
+        load("templates/js/table.js"),
 
-    )
-    page = Template.render("templates/page.py", p=r)
+        # 自定义脚本
+        load("templates/js/raw.js"),
+    ]
+    r = Template.render('templates/template.html', scripts=scripts, csss=csss)
     save('templates/index.html', r)
-    save('page.py', page)
+
 
 
 if __name__ == "__main__":
