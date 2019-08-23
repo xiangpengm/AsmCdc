@@ -5,8 +5,8 @@ import random
 import webview
 import threading
 from hashlib import md5
-import asyncio
-
+from concurrent.futures import ThreadPoolExecutor
+from multiprocessing.pool import ThreadPool
 import json
 
 
@@ -44,6 +44,7 @@ class Api:
 
     def __init__(self):
         self.itemList = []
+        self.pool = ThreadPool(2)
 
     def getCount(self, params):
         if Global.total == 0:
@@ -73,9 +74,9 @@ class Api:
                     total += 1
             Global.setTotal(total)
             self.resetItemList()
+            # todo 改成进程池
             for f, filePath in fileList:
-                t = threading.Thread(target=self.getFileMD5, args=(filePath, ))
-                t.start()
+                self.pool.apply_async(self.getFileMD5, (filePath, ))
             return {
                 "path": result[0], 
                 "total": total
@@ -104,6 +105,7 @@ class Api:
         return json.dumps(r, ensure_ascii=False)
 
     def getFileMD5(self, file):  # check大文件的MD5值
+        print('run check md5 sum', threading.current_thread().name)
         m = md5()
         f = open(file, 'rb')
         buffer = 8192
@@ -126,6 +128,6 @@ if __name__ == '__main__':
         'CDC Assembly Client', 
         html=load("templates/index.html"), 
         js_api=api,
-        min_size=(960, 720)
+        min_size=(720, 540)
     )
     webview.start()

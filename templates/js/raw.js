@@ -22,7 +22,7 @@ function drawTable(container, data){
     log("start call draw table func", container)
         $(container).prepend(`
         <table id="table" 
-        data-page-size="4"   
+        data-page-size="2"   
         data-pagination="true"
         >
         <thead>
@@ -74,7 +74,7 @@ function getFilePath(){
                 // 获取数据
                 getFileData(function(){
                     if (g.inputPath !== '' && g.outputPath !== '') {
-                        alertify.message("配置加载完毕, 请开始任务", 2)
+                        alertify.success("配置加载完毕, 请开始任务", 2)
                     }
                 })
             })
@@ -96,7 +96,7 @@ function getOutputPath(){
             s.innerHTML = response
             alertify.alert("输出目录已选择", function(){                
                 if (g.inputPath !== '' && g.outputPath !== '') {
-                    alertify.message("配置加载完毕, 请开始任务", 500)
+                    alertify.success("配置加载完毕, 请开始任务", 2)
                 }
             })
         }

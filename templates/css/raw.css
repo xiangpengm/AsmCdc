@@ -338,3 +338,7 @@ a.pure-button-primary {
     right: 0;
     z-index: 10;
 }
+
+.bootstrap-table {
+    color: black;    
+}
