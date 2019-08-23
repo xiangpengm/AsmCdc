@@ -1,13 +1,12 @@
 import os
 import sys
 import time
-import random
 import webview
-import threading
 from hashlib import md5
-from concurrent.futures import ThreadPoolExecutor
-from multiprocessing.pool import ThreadPool
 import json
+
+from check import enter, Global
+from multiprocessing import Manager
 
 
 def load(file, tp='r'):
@@ -15,45 +14,20 @@ def load(file, tp='r'):
         return f.read()
 
 
-class Global(object):
-    total = 0
-    current = 0
-    mutex = threading.Lock()
-
-    @classmethod
-    def setTotal(cls, value):
-        cls.mutex.acquire()
-        cls.total = value
-        cls.mutex.release()
-
-    @classmethod
-    def addCurrent(cls):
-        cls.mutex.acquire()
-        cls.current += 1
-        cls.mutex.release()
-    
-    @classmethod
-    def reset(cls):
-        cls.mutex.acquire()
-        cls.total = 0
-        cls.current = 0
-        cls.mutex.release()
-
-
 class Api:
+    m = Manager()
 
     def __init__(self):
-        self.itemList = []
-        self.pool = ThreadPool(2)
+        self.itemList = self.m.list()
 
     def getCount(self, params):
-        if Global.total == 0:
+        if Global.total() == 0:
             return "noTask"
-        elif Global.current == Global.total:
+        elif Global.count() == Global.total():
             Global.reset()
             return 1
         else:
-            return Global.current/Global.total
+            return Global.status()
 
     def getFilePath(self, params):
         result = window.create_file_dialog(
@@ -65,6 +39,7 @@ class Api:
         else:
             # 重置
             Global.reset()
+            self.itemListReset()
             fileList = []
             total = 0
             for f in os.listdir(result[0]):
@@ -73,10 +48,9 @@ class Api:
                     fileList.append((f, filePath))
                     total += 1
             Global.setTotal(total)
-            self.resetItemList()
             # todo 改成进程池
-            for f, filePath in fileList:
-                self.pool.apply_async(self.getFileMD5, (filePath, ))
+            files = [(filePath, self.itemList) for f, filePath in fileList]
+            enter(files)
             return {
                 "path": result[0], 
                 "total": total
@@ -93,7 +67,6 @@ class Api:
             return result[0]
 
     def getFileData(self, param):
-        print("itemlist:", self.itemList)
         r = []
         for index, cell in enumerate(self.itemList):
             item = {
@@ -104,23 +77,8 @@ class Api:
             r.append(item)
         return json.dumps(r, ensure_ascii=False)
 
-    def getFileMD5(self, file):  # check大文件的MD5值
-        print('run check md5 sum', threading.current_thread().name)
-        m = md5()
-        f = open(file, 'rb')
-        buffer = 8192
-        while 1:
-            chunk = f.read(buffer)
-            if not chunk:
-                break
-            m.update(chunk)
-        f.close()
-        Global.addCurrent()
-        self.itemList.append((file, m.hexdigest()))
-
-    def resetItemList(self):
-        self.itemList = []
-
+    def itemListReset(self):
+        self.itemList = self.m.list()
 
 if __name__ == '__main__':
     api = Api()
