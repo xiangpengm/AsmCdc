@@ -1,12 +1,6 @@
 from hashlib import md5
-from multiprocessing import current_process
-from concurrent.futures import ProcessPoolExecutor
-from concurrent.futures import ThreadPoolExecutor
-from multiprocessing import Lock
+from multiprocessing import Lock, cpu_count, Value
 from multiprocessing.pool import Pool
-from multiprocessing import cpu_count
-from multiprocessing import Value
-import time
 
 
 # 全局变量
