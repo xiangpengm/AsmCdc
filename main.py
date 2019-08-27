@@ -4,12 +4,12 @@ import json
 from utils import *
 from multiprocessing import Manager
 
-
 from check import enter, Global
 from pipe import PipeManager, Pipe
 
 
 class Api:
+    # 进程中的共享数据
     m = Manager()
     pipeManager = PipeManager(Pipe.Assembly)
 
@@ -95,15 +95,13 @@ class Api:
         """
         r = []
         # 这里返回给定的样本表格
-        statusList = self.pipeStatus("")
         # todo 此处有问题
         for index, cell in enumerate(self.itemList):
             item = {
-                "id": index+1,
                 "sample": "sample{}".format(index//2),
                 "name": os.path.basename(cell[0]),
                 "hash": cell[1],
-                "status": statusList[index]
+                "status": "waiting",
             }
             r.append(item)
         # 返回当前计算的hash数据
@@ -150,6 +148,6 @@ if __name__ == '__main__':
         'CDC Assembly Client', 
         html=load("templates/index.html"), 
         js_api=api,
-        min_size=(720, 540)
+        min_size=(800, 600)
     )
     webview.start()

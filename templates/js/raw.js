@@ -6,6 +6,7 @@ const g = {
     getFile: false,
     fileData: [],
     taskStart: false,
+    taskLableAdd: false,
 }
 
 let log = function(...arguments){
@@ -19,28 +20,43 @@ let log = function(...arguments){
     ter.innerHTML = s
 }
 
+function mergeTable($table, size, field, rowSpan) {
+    for (let i = 0; i < size; i += rowSpan) {
+        $table.bootstrapTable("mergeCells", { index: i, field: field, rowspan: rowSpan })
+    }
+}
+
+
 function drawTable(container, data){
     log("start call draw table func", container)
-        $(container).prepend(`
-        <table id="table" 
-        data-page-size="2"   
-        data-pagination="true"
-        >
-            <thead>
-                <tr>
-                    <th data-field="id">ID</th>
-                    <th data-field="sample">Sample</th>
-                    <th data-field="name">File Name</th>
-                    <th data-field="hash">File Hash</th>
-                    <th data-field="status">Item Status</th>
-                </tr>
-            </thead>
-        </table>
+    let pageSize = 4
+    // <th data-field="hash">File Hash</th>
+    $(container).prepend(`
+    <table id="table" 
+    data-page-size="2"   
+    data-pagination="true"
+    >
+    <thead>
+            <tr>
+                <th data-field="sample">Sample</th>
+                <th data-field="name">File Name</th>
+                <th data-field="status">Sample Task Status</th>
+            </tr>
+        </thead>
+    </table>
     `) 
     log("table draw table func")
     let $table = $('#table')
     log("draw draw table func")
-    $table.bootstrapTable({ data: data })
+    $table.bootstrapTable({ 
+        data: data,
+        onPageChange: function (number, size) {
+            mergeTable($table, pageSize, "sample", 2)
+            mergeTable($table, pageSize, "status", 2)
+        }
+    })
+    mergeTable($table, pageSize, "sample", 2)
+    mergeTable($table, pageSize, "status", 2)
     log("end draw table func")
 }
 
@@ -72,11 +88,14 @@ function getFilePath(){
                 getFileData(function(){
                     if (g.inputPath !== '' && g.outputPath !== '') {
                         let container = "#gua-div-table-container"
-                        $(container).append(`
-                                <p>
-                                    <a id="gua-button-start" href="#" class="pure-button pure-button-primary">Start Task</a>
-                                </p>
-                        `)
+                        if (g.taskLableAdd === false) {
+                            $(container).append(`
+                            <p>
+                            <a id="gua-button-start" href="#" class="pure-button pure-button-primary">Start Task</a>
+                            </p>
+                            `)
+                            g.taskLableAdd = true
+                        }
                         alertify.success("配置加载完毕, 请开始任务", 2)
                     }
                 })
@@ -100,11 +119,14 @@ function getOutputPath(){
             alertify.alert("输出目录已选择", function(){
                 if (g.inputPath !== '' && g.outputPath !== '') {
                     let container = "#gua-div-table-container"
-                    $(container).append(`
+                    if (g.taskLableAdd === false) {
+                        $(container).append(`
                             <p>
-                                <a id="gua-button-start" href="#" class="pure-button pure-button-primary">Start Task</a>
+                            <a id="gua-button-start" href="#" class="pure-button pure-button-primary">Start Task</a>
                             </p>
-                    `)
+                            `)
+                        g.taskLableAdd = true
+                    }
                     alertify.success("配置加载完毕, 请开始任务", 2)
                 }
             })
@@ -224,6 +246,12 @@ function main() {
     })
     bindEvent("#gua-a-selector-status", function () {
         pipeStatus()
+    })
+    bindEvent("body", function (event) {
+        let self = event.target
+        log("click start", self.id)
+        if (self.id === "gua-button-start") {
+        }
     })
     log("end main function")
 }

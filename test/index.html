@@ -11,7 +11,7 @@
   </head>
   <body >
     <div id="gua-div-table-container">
-      
+
     </div>
     <button id="btn">Hello</button>
 
@@ -19,99 +19,83 @@
       <script> {{ s }} </script>
     {% endfor %}
     <script>
-        // function bindEvent(selector, callback) {
-        //   //给一个按钮绑定事件
-        //   let b = document.querySelector(selector)
-        //   b.addEventListener('click', callback)
-        // }
 
+        function mergeTable($table, size, field, rowSpan) {
+            for (let i = 0; i < size; i += rowSpan) {
+                $table.bootstrapTable("mergeCells", {index: i, field: field, rowspan: rowSpan})
+            }
+        }
 
         function drawTable(container, data){
+            let pageSize = 4
           $(container).append(`
-              <table id="table" 
-                  data-page-size="2"   
+              <table id="table"
+                  data-page-size="${pageSize}"
                   data-pagination="true"
               >
                 <thead>
                   <tr>
                     <th data-field="id">ID</th>
+                    <th data-field="simple">Simple</th>
                     <th data-field="name">Item Name</th>
                     <th data-field="hash">Item Hash</th>
                   </tr>
                 </thead>
               </table>
-            `)  
+            `)
           let $table = $('#table')
-          $table.bootstrapTable({ 
-            data: data, 
-            pageSize: 2 
+          // 初始化 table
+          $table.bootstrapTable({
+            data: data,
+            onPageChange: function (number, size) {
+                mergeTable($table, pageSize, "simple", 2)
+            }
           })
+          mergeTable($table, pageSize, "simple", 2)
+          // 首页合并表格
         }
         let data = [
             {
               id: 0,
+              simple: "sample1",
               name: "wang",
               hash: "1",
             },
             {
             id: 1,
+            simple: "sample1",
             name: "wang",
             hash: "1",
-            },   
-          {
+            },
+           {
             id: 2,
+            simple: "sample2",
             name: "wang",
             hash: "1",
-          },             {
+           },
+           {
             id: 3,
+            simple: "sample2",
             name: "wang",
             hash: "1",
-          },             {
+           },
+           {
             id: 4,
+            simple: "sample3",
             name: "wang",
             hash: "1",
-          },             {
+          },
+            {
             id: 5,
+            simple: "sample3",
             name: "wang",
             hash: "1",
-          },             {
-            id: 6,
-            name: "wang",
-            hash: "1",
-          },             {
-            id: 7,
-            name: "wang",
-            hash: "1",
-          },             {
-            id: 8,
-            name: "wang",
-            hash: "1",
-          },             {
-            id: 9,
-            name: "wang",
-            hash: "1",
-          },             {
-            id: 10,
-            name: "wang",
-            hash: "1",
-          },             {
-            id: 11,
-            name: "wang",
-            hash: "1",
-          },             {
-            id: 12,
-            name: "wang",
-            hash: "1",
-          },             {
-            id: 13,
-            name: "wang",
-            hash: "1",
-          },        
-
+          }
         ]
         $("#btn").bind("click", function () {
             drawTable("#gua-div-table-container", data)
         })
+        
         </script>
-  </body> 
+  </body>
 </html>
