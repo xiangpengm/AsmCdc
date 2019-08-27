@@ -17,6 +17,8 @@ class Assembly(object):
     def run(self, status):
         # 每个任务都需要自行设置运行的状态
         log("aseembly", self.id, "start running")
+        fastq1 = self.args[0]
+        fastq2 = self.args[1]
         status.setState("clean data")
         time.sleep(10)
         status.setState("merge data")

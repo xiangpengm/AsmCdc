@@ -62,6 +62,8 @@ class Api:
             # 提交任务
             # fixed 改成进程池
             files = [(filePath, self.itemList) for f, filePath in fileList]
+            args = self.parseArgs([filePath for _, filePath in fileList])
+            self.pipeManager.update(args)
             enter(files)
             return {
                 "path": result[0], 
@@ -130,11 +132,7 @@ class Api:
         """
         # 异步开启流程任务
         # 返回消息
-        fastq_list = [(1, 2), (1, 2), (1, 2), (1, 2)]
-        self.pipeManager.update(fastq_list)
-        r = self.pipeManager.start()
-        return
-
+        self.pipeManager.start()
 
     def pipeStatus(self, params):
         """
@@ -150,10 +148,17 @@ class Api:
             "done": done,
             "status": status
         }
-        
         return r
 
-
+    def parseArgs(self, fastqFileList):
+        fastqFileList.sort()
+        args = []
+        for i in range(0, len(fastqFileList), 2):
+            print(len(fastqFileList))
+            print(i)
+            arg = (fastqFileList[i], fastqFileList[i+1])
+            args.append(arg)
+        return args
 
 if __name__ == '__main__':
     api = Api()

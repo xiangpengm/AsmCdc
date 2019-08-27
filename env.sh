@@ -1,1 +1,3 @@
-pip install ete3 numba numpy pandas sklearn
+# 组装流程依赖
+sudo apt install pigz
+sudo apt install openjdk-8-jdk
