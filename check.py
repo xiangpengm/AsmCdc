@@ -2,7 +2,6 @@ from hashlib import md5
 from multiprocessing import Lock, cpu_count, Value
 from multiprocessing.pool import Pool
 
-
 # 全局变量
 class Global(object):
     lock = Lock()
@@ -63,7 +62,6 @@ def getFileMD5(file, itemList):
     f.close()
     Global.countAdd()
     itemList.append((file, m.hexdigest()))
-
 
 p = Pool((cpu_count()-1)*2)
 

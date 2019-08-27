@@ -1,15 +1,28 @@
 const g = {
+    // 存储日志
     log: [],
-    // input
+    // 存储输入目录input
     inputPath: '',
+    // 存储输出目录
     outputPath: '',
+    // 是否获取文件
     getFile: false,
+    // 文件数据
     fileData: [],
+    // 标记任务是否开始
     taskStart: false,
+    // 标记标签是否添加
     taskLableAdd: false,
+    // sampleData 存放返回的数据, 
+    sampleData: [],
+    // 标记所有任务是否结束
+    taskDone: false,
 }
 
 let log = function(...arguments){
+    /*
+    打印函数
+    */
     let ter = document.querySelector("#gua-div-terminal")
     let time = new Date()
     arguments.unshift(time.toJSON()+':')
@@ -21,19 +34,27 @@ let log = function(...arguments){
 }
 
 function mergeTable($table, size, field, rowSpan) {
+    /*
+    把bootstrap对象根据size和列进行合并
+    合并的行数有rowSpan决定
+    */
     for (let i = 0; i < size; i += rowSpan) {
         $table.bootstrapTable("mergeCells", { index: i, field: field, rowspan: rowSpan })
     }
+    log("run merge")
 }
 
 
 function drawTable(container, data){
+    /*
+    传入容器来绘制表格
+    */
     log("start call draw table func", container)
     let pageSize = 4
     // <th data-field="hash">File Hash</th>
     $(container).prepend(`
     <table id="table" 
-    data-page-size="2"   
+    data-page-size="${pageSize}"   
     data-pagination="true"
     >
     <thead>
@@ -60,9 +81,30 @@ function drawTable(container, data){
     log("end draw table func")
 }
 
+function updateTable($table, field, items){
+    for (let index = 0; index < items.length; index++) {
+        const value = items[index];
+        $table.bootstrapTable('updateCell', {index: index, field: field, value: value})
+    }
+    let pageSize = 4
+    for (let index = 0; index < pageSize; index+=2) {
+        log("merge index", index)
+        $table.bootstrapTable("mergeCells", {index: index, field: "sample", rowspan: 2})
+        $table.bootstrapTable("mergeCells", {index: index, field: field, rowspan: 2})
+
+    }
+}
 
 function getFileData(callback) {
     pywebview.api.getFileData().then(function (response) {
+        log("response", response)
+        for (let index = 0; index < response.length; index++) {
+            const element = response[index];
+            log("response type", index, JSON.stringify(element))
+            g.sampleData.push(element)
+        }
+        log("globe ", JSON.stringify(g.sampleData))
+
         drawTable("#gua-div-table-container", response)
         callback()
     })
@@ -97,6 +139,7 @@ function getFilePath(){
                             g.taskLableAdd = true
                         }
                         alertify.success("配置加载完毕, 请开始任务", 2)
+                        g.taskDone = false
                     }
                 })
             })
@@ -117,6 +160,7 @@ function getOutputPath(){
             let s = document.querySelector('#gua-id-span-output-path')
             s.innerHTML = response
             alertify.alert("输出目录已选择", function(){
+                log(JSON.stringify(g))
                 if (g.inputPath !== '' && g.outputPath !== '') {
                     let container = "#gua-div-table-container"
                     if (g.taskLableAdd === false) {
@@ -219,14 +263,38 @@ function getCountBar(parentSelector, callback) {
 }
 
 function pipeStart() {
-    pywebview.api.pipeStart().then(function(response) {
-        log("pipeStart response", response)
-    })
+    if (g.taskDone === false) {
+        pywebview.api.pipeStart().then(function(response) {
+            log("pipeStart response", response)
+            // 删除 start 按钮
+            $("#gua-button-start").parent().remove()
+            g.taskLableAdd = false
+        })
+    } else {
+        alertify.alert("所有任务都已经执行完成")
+    }
 }
 
-function pipeStatus() {
+function pipeStatus(taskStatusId) {
     pywebview.api.pipeStatus().then(function(response) {
-        log("pipeStatus response", response)
+        if (response.total === response.done) {
+            clearInterval(taskStatusId)
+            g.taskDone = true
+            alertify.alert("所有任务已经执行完毕", function() {})
+        } 
+
+        let status = response.status
+        let newStatus = []
+        for (let index = 0; index < status.length; index++) {
+            const element = status[index];
+            newStatus.push(element)
+            newStatus.push(element)
+        }
+        // remove table
+        let pageSize = 4
+        log("status", JSON.stringify(status))
+        log("new status", JSON.stringify(newStatus))
+        updateTable( $("#table"), "status", newStatus)
     })
 }
 
@@ -241,16 +309,15 @@ function main() {
     bindEvent("#gua-a-selector-directory-output", function () {
         getOutputPath()
     })
-    bindEvent("#gua-a-selector-start", function () {
-        pipeStart()
-    })
-    bindEvent("#gua-a-selector-status", function () {
-        pipeStatus()
-    })
     bindEvent("body", function (event) {
         let self = event.target
         log("click start", self.id)
         if (self.id === "gua-button-start") {
+            pipeStart()
+            // 切换场景为table进度条
+            let taskStatusId = setInterval(function(){
+                pipeStatus(taskStatusId)
+            }, 1000)
         }
     })
     log("end main function")

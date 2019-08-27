@@ -96,7 +96,8 @@ class Api:
         r = []
         # 这里返回给定的样本表格
         # todo 此处有问题
-        for index, cell in enumerate(self.itemList):
+        itemList = self.getItemList()
+        for index, cell in enumerate(itemList):
             item = {
                 "sample": "sample{}".format(index//2),
                 "name": os.path.basename(cell[0]),
@@ -104,6 +105,7 @@ class Api:
                 "status": "waiting",
             }
             r.append(item)
+        
         # 返回当前计算的hash数据
         # 把样本信息传递给PipeManager
         return json.dumps(r, ensure_ascii=False)
@@ -116,6 +118,9 @@ class Api:
         """
         self.itemList = self.m.list()
 
+    def getItemList(self):
+        itemList = sorted(self.itemList, key=lambda item: item[0])
+        return itemList
 
     def pipeStart(self, params):
         """
@@ -137,8 +142,16 @@ class Api:
         :return:
         :rtype:
         """
-        print("pipeStatus", self.pipeManager.allState())
-        return self.pipeManager.allState()
+        status = self.pipeManager.allState()
+        total = len(status)
+        done  = status.count('done') 
+        r = {
+            "total": total,
+            "done": done,
+            "status": status
+        }
+        
+        return r
 
 
 

@@ -5,7 +5,7 @@ from utils import log
 
 
 class Pipe(enum.Enum):
-    Assembly = enum.auto()
+    Assembly = 0
 
 
 class Assembly(object):
@@ -18,11 +18,11 @@ class Assembly(object):
         # 每个任务都需要自行设置运行的状态
         log("aseembly", self.id, "start running")
         status.setState("clean data")
-        time.sleep(5)
+        time.sleep(10)
         status.setState("merge data")
-        time.sleep(5)
+        time.sleep(10)
         status.setState("assembly data")
-        time.sleep(5)
+        time.sleep(10)
         # 运行结束后设置状态为结束
         status.setDone()
         log("aseembly", self.id, "end running")
