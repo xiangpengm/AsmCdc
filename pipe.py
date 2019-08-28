@@ -2,6 +2,16 @@ import enum
 import time
 from multiprocessing.pool import ThreadPool
 from utils import log
+import os
+import tempfile
+import subprocess
+import shutil
+from multiprocessing import cpu_count
+import psutil
+
+
+#  psutil.cpu_count
+#  psutil.virtual_memory
 
 
 class Pipe(enum.Enum):
@@ -13,22 +23,76 @@ class Assembly(object):
     def __init__(self, taskid, args):
         self.args = args
         self.id = taskid
+        self.workDir = self.tempDir()
+        self.threads = cpu_count() // 2
 
     def run(self, status):
         # 每个任务都需要自行设置运行的状态
         log("aseembly", self.id, "start running")
-        fastq1 = self.args[0]
-        fastq2 = self.args[1]
-        status.setState("clean data")
-        time.sleep(10)
-        status.setState("merge data")
-        time.sleep(10)
-        status.setState("assembly data")
-        time.sleep(10)
-        # 运行结束后设置状态为结束
-        status.setDone()
-        log("aseembly", self.id, "end running")
+        outputDir = self.args[2]
+        # 初始化工作路径
+        # 初始化参数
+        #  clean参数
+        logFile = self.workDir + "/{}_{}.log".format(self.__class__.__name__, self.id)
+        fastq1 = os.path.join(self.workDir, os.path.basename(self.args[0]))
+        fastq2 = os.path.join(self.workDir, os.path.basename(self.args[1]))
+        fastq1unpaired = fastq1 + ".unpaired.fq.gz"
+        fastq2unpaired = fastq2 + ".unpaired.fq.gz"
+        # clean的输出asm的输入
+        fastq1Clean = fastq1 + ".clean.fq.gz"
+        fastq2Clean = fastq2 + ".clean.fq.gz"
+        #  asm参数
+        asmDir = os.path.join(self.workDir, 'asm')
 
+        # 复制文件
+        status.setState("copy file to work dir")
+        shutil.copyfile(self.args[0], fastq1)
+        shutil.copyfile(self.args[1], fastq2)
+
+        # 过滤数据
+        status.setState("clean fastq file")
+        cleanCmd = f"""trimmomatic PE -threads {self.threads} \
+            -trimlog {logFile} \
+            {fastq1} {fastq2}\
+            {fastq1Clean} \
+            {fastq1unpaired} \
+            {fastq2Clean} \
+            {fastq2unpaired} \
+            LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36"""
+        print("cleanCmd", cleanCmd)
+        os.system(cleanCmd)
+
+        # 组装
+        status.setState("clean fastq file")
+        asmCmd = f"""spades.py -o {asmDir} \
+            --pe1-1 {fastq1Clean} \
+            --pe1-2 {fastq2Clean} \
+            --only-assembler --careful --cov-cutoff auto"""
+        print("asmCmd", asmCmd)
+        os.system(asmCmd)
+
+        # 移动组装数据到输出目录
+        status.setState("move fasta file to output dir")
+        outputBasename = "assemble_{}.fa".format(self.id)
+        spadesOutput = os.path.join(asmDir, "scaffolds.fasta")
+        outputFasta = os.path.join(outputDir, outputBasename)
+        shutil.copyfile(spadesOutput, outputFasta)
+
+        # 压缩输出文件
+        status.setState("gzip fasta file")
+        os.system("cd \"{}\" && gzip {}".format(outputDir, outputBasename))
+
+        # 清理工作目录 clean
+        status.setState("clean temp file")
+        shutil.rmtree(self.workDir)
+
+    def tempDir(self):
+        template = "/tmp/{}_{}".format(self.__class__.__name__, self.id)
+        if not os.path.exists(template):
+            print("create temp dir")
+            os.makedirs(template)
+        return template
+    
 
 class Status(object):
 
@@ -138,4 +202,14 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    a = Assembly(
+        12, (
+        "/Users/xiangpeng/Desktop/04. 我的仓库/AsmCdc/test/S-4_FDMS190640081-1a/S-4_FDMS190640081-1a_1.clean.fq.gz",
+        "/Users/xiangpeng/Desktop/04. 我的仓库/AsmCdc/test/S-4_FDMS190640081-1a/S-4_FDMS190640081-1a_2.clean.fq.gz",
+        "/tmp/output"
+        )
+    )
+    print(a.tempDir())
+    status =  Status(0)
+    a.run(status)

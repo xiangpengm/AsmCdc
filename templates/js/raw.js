@@ -317,7 +317,7 @@ function main() {
             // 切换场景为table进度条
             let taskStatusId = setInterval(function(){
                 pipeStatus(taskStatusId)
-            }, 1000)
+            }, 3000)
         }
     })
     log("end main function")

@@ -59,12 +59,13 @@ class Api:
                     fileList.append((f, filePath))
                     total += 1
             Global.setTotal(total)
+            self.fileList = fileList[::]
             # 提交任务
             # fixed 改成进程池
+            # 计算md5值
             files = [(filePath, self.itemList) for f, filePath in fileList]
-            args = self.parseArgs([filePath for _, filePath in fileList])
-            self.pipeManager.update(args)
             enter(files)
+            # 返回结果
             return {
                 "path": result[0], 
                 "total": total
@@ -85,6 +86,7 @@ class Api:
         if result is None:
             return "None"
         else:
+            self.output = result[0]
             return result[0]
 
     def getFileData(self, param):
@@ -132,6 +134,8 @@ class Api:
         """
         # 异步开启流程任务
         # 返回消息
+        args = self.parseArgs([filePath for _, filePath in self.fileList])
+        self.pipeManager.update(args)
         self.pipeManager.start()
 
     def pipeStatus(self, params):
@@ -154,9 +158,7 @@ class Api:
         fastqFileList.sort()
         args = []
         for i in range(0, len(fastqFileList), 2):
-            print(len(fastqFileList))
-            print(i)
-            arg = (fastqFileList[i], fastqFileList[i+1])
+            arg = (fastqFileList[i], fastqFileList[i+1], self.output)
             args.append(arg)
         return args
 
