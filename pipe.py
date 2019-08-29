@@ -21,6 +21,7 @@ class Pipe(enum.Enum):
 class Assembly(object):
 
     def __init__(self, taskid, args):
+        print("instanse ", taskid, args)
         self.args = args
         self.id = taskid
         self.workDir = self.tempDir()
@@ -63,7 +64,7 @@ class Assembly(object):
         os.system(cleanCmd)
 
         # 组装
-        status.setState("clean fastq file")
+        status.setState("assembly file")
         asmCmd = f"""spades.py -o {asmDir} \
             --pe1-1 {fastq1Clean} \
             --pe1-2 {fastq2Clean} \
@@ -85,6 +86,7 @@ class Assembly(object):
         # 清理工作目录 clean
         status.setState("clean temp file")
         shutil.rmtree(self.workDir)
+        status.setState("done")
 
     def tempDir(self):
         template = "/tmp/{}_{}".format(self.__class__.__name__, self.id)

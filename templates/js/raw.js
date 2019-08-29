@@ -23,14 +23,14 @@ let log = function(...arguments){
     /*
     打印函数
     */
-    let ter = document.querySelector("#gua-div-terminal")
-    let time = new Date()
-    arguments.unshift(time.toJSON()+':')
-    let line = arguments.join(' ')
-    g.log.push(line)
-    let s = g.log.join('<br>') 
-    s = s + '<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>'
-    ter.innerHTML = s
+    // let ter = document.querySelector("#gua-div-terminal")
+    // let time = new Date()
+    // arguments.unshift(time.toJSON()+':')
+    // let line = arguments.join(' ')
+    // g.log.push(line)
+    // let s = g.log.join('<br>') 
+    // s = s + '<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>'
+    // ter.innerHTML = s
 }
 
 function mergeTable($table, size, field, rowSpan) {
@@ -285,10 +285,16 @@ function pipeStatus(taskStatusId) {
 
         let status = response.status
         let newStatus = []
+        let date = new Date().toLocaleString()
         for (let index = 0; index < status.length; index++) {
             const element = status[index];
-            newStatus.push(element)
-            newStatus.push(element)
+            if (element === "done"){
+                newStatus.push(element)
+                newStatus.push(element)
+            } else{
+                newStatus.push(element + "<br>" + date)
+                newStatus.push(element + "<br>" + date)
+            }
         }
         // remove table
         let pageSize = 4
@@ -317,7 +323,7 @@ function main() {
             // 切换场景为table进度条
             let taskStatusId = setInterval(function(){
                 pipeStatus(taskStatusId)
-            }, 3000)
+            }, 1000)
         }
     })
     log("end main function")

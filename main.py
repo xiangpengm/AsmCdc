@@ -54,7 +54,7 @@ class Api:
             total = 0
             # 扫描目录
             for f in os.listdir(result[0]):
-                if f.endswith('.gz'):
+                if f.endswith('fq.gz') or f.endswith('fastq.gz') or f.endswith('fq') or f.endswith('fastq'):
                     filePath = os.path.join(result[0], f)
                     fileList.append((f, filePath))
                     total += 1
@@ -101,6 +101,9 @@ class Api:
         # 这里返回给定的样本表格
         # todo 此处有问题
         itemList = self.getItemList()
+        print("return before sort itemList", itemList)
+        itemList = self.sortItem(itemList)
+        print("return after  sort itemList", itemList)
         for index, cell in enumerate(itemList):
             item = {
                 "sample": "sample{}".format(index//2),
@@ -134,8 +137,9 @@ class Api:
         """
         # 异步开启流程任务
         # 返回消息
-        args = self.parseArgs([filePath for _, filePath in self.fileList])
+        args = self.parseArgs([filePath for _, filePath in self.fileList], self.output)
         self.pipeManager.update(args)
+        print("main pipeManager start")
         self.pipeManager.start()
 
     def pipeStatus(self, params):
@@ -154,13 +158,31 @@ class Api:
         }
         return r
 
-    def parseArgs(self, fastqFileList):
-        fastqFileList.sort()
+    def parseArgs(self, fastqFileList, *other):
         args = []
-        for i in range(0, len(fastqFileList), 2):
-            arg = (fastqFileList[i], fastqFileList[i+1], self.output)
-            args.append(arg)
+        while fastqFileList:
+            this = fastqFileList.pop()
+            for file in fastqFileList:
+                if is_paired(this, file):
+                    arg = [this, file]
+                    arg.sort()
+                    arg.extend(other)
+                    args.append(tuple(arg))
         return args
+
+    def sortItem(self, items):
+        dt = {}
+        r = []
+        for item in items:
+            dt[os.path.basename(item[0])] = item
+        fqList = list(dt.keys())
+        args = self.parseArgs(fqList)
+        for arg in args:
+            r.append(dt.get(arg[0]))
+            r.append(dt.get(arg[1]))
+        return r
+
+
 
 if __name__ == '__main__':
     api = Api()
