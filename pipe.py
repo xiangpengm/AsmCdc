@@ -1,5 +1,6 @@
 import enum
 import time
+from datetime import datetime
 from multiprocessing.pool import ThreadPool
 from utils import log
 import os
@@ -8,10 +9,6 @@ import subprocess
 import shutil
 from multiprocessing import cpu_count
 import psutil
-
-
-#  psutil.cpu_count
-#  psutil.virtual_memory
 
 
 class Pipe(enum.Enum):
@@ -30,6 +27,7 @@ class Assembly(object):
     def run(self, status):
         # 每个任务都需要自行设置运行的状态
         log("aseembly", self.id, "start running")
+        startTime = datetime.now()
         outputDir = self.args[2]
         # 初始化工作路径
         # 初始化参数
@@ -72,6 +70,7 @@ class Assembly(object):
         print("asmCmd", asmCmd)
         os.system(asmCmd)
 
+        # todo 先压缩在copy, 之后在清除
         # 移动组装数据到输出目录
         status.setState("move fasta file to output dir")
         outputBasename = "assemble_{}.fa".format(self.id)
@@ -86,7 +85,12 @@ class Assembly(object):
         # 清理工作目录 clean
         status.setState("clean temp file")
         shutil.rmtree(self.workDir)
-        status.setState("done")
+
+        # 结束
+        endTime = datetime.now()
+        useTime = endTime - startTime
+        useTimeStr = time.strftime("%H:%M:%S", time.gmtime(int(useTime.total_seconds())))
+        status.setState("done<br>" + useTimeStr)
 
     def tempDir(self):
         template = "/tmp/{}_{}".format(self.__class__.__name__, self.id)

@@ -11,7 +11,19 @@
   </head>
   <body >
     <div id="gua-div-table-container">
-
+      <table id="table" data-toggle="table" data-height="460" data-width="200" data-pagination="true" data-side-pagination="server"
+        data-page-list="[]"
+        data-url="https://examples.wenzhixin.net.cn/examples/bootstrap_table/data"
+        style="table-layout: fixed"
+        >
+        <thead>
+          <tr>
+            <th data-field="id">ID</th>
+            <th data-field="name">Item Name</th>
+            <th data-field="price">Item Price</th>
+          </tr>
+        </thead>
+      </table>
     </div>
     <button id="btn">Hello</button>
 
@@ -93,7 +105,11 @@
           }
         ]
         $("#btn").bind("click", function () {
-            drawTable("#gua-div-table-container", data)
+            // drawTable("#gua-div-table-container", data)
+          var $table = $('#table')
+          $(function () {
+
+          })
         })
         
         </script>

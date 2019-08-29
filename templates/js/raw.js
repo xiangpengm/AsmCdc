@@ -54,7 +54,8 @@ function drawTable(container, data){
     // <th data-field="hash">File Hash</th>
     $(container).prepend(`
     <table id="table" 
-    data-page-size="${pageSize}"   
+    data-page-size="${pageSize}"
+    data-page-list="[]"
     data-pagination="true"
     >
     <thead>
@@ -71,6 +72,7 @@ function drawTable(container, data){
     log("draw draw table func")
     $table.bootstrapTable({ 
         data: data,
+
         onPageChange: function (number, size) {
             mergeTable($table, pageSize, "sample", 2)
             mergeTable($table, pageSize, "status", 2)
@@ -288,7 +290,7 @@ function pipeStatus(taskStatusId) {
         let date = new Date().toLocaleString()
         for (let index = 0; index < status.length; index++) {
             const element = status[index];
-            if (element === "done"){
+            if (element === "done" || element === "waiting"){
                 newStatus.push(element)
                 newStatus.push(element)
             } else{
