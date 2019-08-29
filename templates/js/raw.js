@@ -290,7 +290,7 @@ function pipeStatus(taskStatusId) {
         let date = new Date().toLocaleString()
         for (let index = 0; index < status.length; index++) {
             const element = status[index];
-            if (element.startswith("done") || element === "waiting"){
+            if (element.startsWith("done") || element === "waiting"){
                 newStatus.push(element)
                 newStatus.push(element)
             } else{

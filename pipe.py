@@ -91,6 +91,7 @@ class Assembly(object):
         useTime = endTime - startTime
         useTimeStr = time.strftime("%H:%M:%S", time.gmtime(int(useTime.total_seconds())))
         status.setState("done<br>" + useTimeStr)
+        log("assembly", self.id, "end")
 
     def tempDir(self):
         template = "/tmp/{}_{}".format(self.__class__.__name__, self.id)
