@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Terminal=true
+Name=CDC Asm Client
+Categories=Development
+Exec=bash /home/cdc/Desktop/AsmCdc/main.sh

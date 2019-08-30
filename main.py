@@ -216,6 +216,7 @@ class Api:
 
 
 if __name__ == '__main__':
+    log("env", os.environ)
     api = Api()
     window = webview.create_window(
         'CDC Assembly Client', 
