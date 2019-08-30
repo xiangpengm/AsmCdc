@@ -14,7 +14,6 @@ def initialized_environment():
     parent = os.path.dirname(__file__)
     # path = os.path.join(parent, 'templates')
     # 创建一个加载器, jinja2 会从这个目录中加载模板
-    # print("path", path)
     loader = FileSystemLoader(parent)
     # 用加载器创建一个环境, 有了它才能读取模板文件
     e = Environment(loader=loader)

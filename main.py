@@ -15,6 +15,7 @@ class Api:
 
     def __init__(self):
         self.itemList = self.m.list()
+        self.exportData = []
 
     def getCount(self, params):
         """
@@ -101,9 +102,7 @@ class Api:
         # 这里返回给定的样本表格
         # todo 此处有问题
         itemList = self.getItemList()
-        print("return before sort itemList", itemList)
         itemList = self.sortItem(itemList)
-        print("return after  sort itemList", itemList)
         for index, cell in enumerate(itemList):
             item = {
                 "sample": "sample{}".format(index//2),
@@ -115,6 +114,8 @@ class Api:
         
         # 返回当前计算的hash数据
         # 把样本信息传递给PipeManager
+        # 存储这个data
+        self.exportDataInit(r)
         return json.dumps(r, ensure_ascii=False)
 
     def itemListReset(self):
@@ -139,7 +140,7 @@ class Api:
         # 返回消息
         args = self.parseArgs([filePath for _, filePath in self.fileList], self.output)
         self.pipeManager.update(args)
-        print("main pipeManager start")
+        log("main pipeManager start")
         self.pipeManager.start()
 
     def pipeStatus(self, params):
@@ -150,12 +151,18 @@ class Api:
         """
         status = self.pipeManager.allState()
         total = len(status)
-        done  = status.count('done') 
+        done = [s.startswith('done') for s in status].count(True)
         r = {
             "total": total,
             "done": done,
             "status": status
         }
+        # 
+        if done == total:
+            log(status)
+            self.exportDataUpdateStatus(status)
+            log(self.exportData)
+            self.exportDataSave()
         return r
 
     def parseArgs(self, fastqFileList, *other):
@@ -182,6 +189,30 @@ class Api:
             r.append(dt.get(arg[1]))
         return r
 
+    def exportDataInit(self, data):
+        self.exportData = data
+
+    def exportDataUpdateStatus(self, statusList):
+        lengthData = len(self.exportData)
+        for index in range(0, lengthData, 2):
+            s = statusList[index//2].replace("done<br>", "")
+            fa = "assembly_{}.fa.gz".format(index//2)
+            self.exportData[index]['status'] = s
+            self.exportData[index + 1]['status'] = s
+            self.exportData[index]['assembly'] = fa
+            self.exportData[index + 1]['assembly'] = fa
+
+
+    def exportDataSave(self):
+        outFile = os.path.join(self.output, "data.csv")
+        header = ["sample", "name", "hash", "status", "assembly"]
+        with open(outFile, 'w') as f:
+            f.write(','.join(header))
+            f.write('\n')
+            for item in self.exportData:
+                line = ','.join([item[col] for col in header ])
+                f.write(line)
+                f.write('\n')
 
 
 if __name__ == '__main__':

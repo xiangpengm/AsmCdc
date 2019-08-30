@@ -18,7 +18,7 @@ class Pipe(enum.Enum):
 class Assembly(object):
 
     def __init__(self, taskid, args):
-        print("instanse ", taskid, args)
+        log("instanse ", taskid, args)
         self.args = args
         self.id = taskid
         self.workDir = self.tempDir()
@@ -58,7 +58,7 @@ class Assembly(object):
             {fastq2Clean} \
             {fastq2unpaired} \
             LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36"""
-        print("cleanCmd", cleanCmd)
+        log("cleanCmd", cleanCmd)
         os.system(cleanCmd)
 
         # 组装
@@ -67,20 +67,20 @@ class Assembly(object):
             --pe1-1 {fastq1Clean} \
             --pe1-2 {fastq2Clean} \
             --only-assembler --careful --cov-cutoff auto"""
-        print("asmCmd", asmCmd)
+        log("asmCmd", asmCmd)
         os.system(asmCmd)
 
         # todo 先压缩在copy, 之后在清除
         # 移动组装数据到输出目录
         status.setState("move fasta file to output dir")
-        outputBasename = "assemble_{}.fa".format(self.id)
+        outputBasename = "assembly_{}.fa".format(self.id)
         spadesOutput = os.path.join(asmDir, "scaffolds.fasta")
         outputFasta = os.path.join(outputDir, outputBasename)
         shutil.copyfile(spadesOutput, outputFasta)
 
         # 压缩输出文件
         status.setState("gzip fasta file")
-        os.system("cd \"{}\" && gzip {}".format(outputDir, outputBasename))
+        os.system("cd \"{}\" && gzip -f {}".format(outputDir, outputBasename))
 
         # 清理工作目录 clean
         status.setState("clean temp file")
@@ -96,7 +96,7 @@ class Assembly(object):
     def tempDir(self):
         template = "/tmp/{}_{}".format(self.__class__.__name__, self.id)
         if not os.path.exists(template):
-            print("create temp dir")
+            log("create temp dir")
             os.makedirs(template)
         return template
     
@@ -217,6 +217,6 @@ if __name__ == "__main__":
         "/tmp/output"
         )
     )
-    print(a.tempDir())
+    log(a.tempDir())
     status =  Status(0)
     a.run(status)
