@@ -319,6 +319,11 @@ a.pure-button-primary {
     height: 200px;
     text-align: center;
     margin: auto;
+    /* 修改 */
+    position: fixed;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
 }
 
 #gua-div-id-label {
@@ -332,4 +337,8 @@ a.pure-button-primary {
     bottom: 0;
     right: 0;
     z-index: 10;
+}
+
+.bootstrap-table {
+    color: black;    
 }
