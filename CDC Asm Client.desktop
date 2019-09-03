@@ -1,6 +1,7 @@
 [Desktop Entry]
 Type=Application
-Terminal=true
+Terminal=false
 Name=CDC Asm Client
 Categories=Development
-Exec=bash /home/cdc/Desktop/AsmCdc/main.sh
+Exec=bash /usr/local/cdcAsm/main.sh
+Icon=/usr/local/cdcAsm/templates/image/cdc.png

@@ -110,3 +110,4 @@ test/
 soft/
 miniconda3
 log.gua.txt
+.vscode/
