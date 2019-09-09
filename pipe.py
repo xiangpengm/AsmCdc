@@ -79,8 +79,8 @@ class Assembly(object):
         shutil.copyfile(spadesOutput, outputFasta)
 
         # 压缩输出文件
-        status.setState("gzip fasta file")
-        os.system("cd \"{}\" && gzip -f {}".format(outputDir, outputBasename))
+        # status.setState("gzip fasta file")
+        # os.system("cd \"{}\" && gzip -f {}".format(outputDir, outputBasename))
 
         # 清理工作目录 clean
         status.setState("clean temp file")

@@ -196,7 +196,7 @@ class Api:
         lengthData = len(self.exportData)
         for index in range(0, lengthData, 2):
             s = statusList[index//2].replace("done<br>", "")
-            fa = "assembly_{}.fa.gz".format(index//2)
+            fa = "assembly_{}.fa".format(index//2)
             self.exportData[index]['status'] = s
             self.exportData[index + 1]['status'] = s
             self.exportData[index]['assembly'] = fa
