@@ -18,6 +18,8 @@ sudo mkdir /usr/local/cdcAsm/
 sudo cp *.py /usr/local/cdcAsm/
 sudo cp -a templates /usr/local/cdcAsm/
 sudo cp main.sh /usr/local/cdcAsm/
+sudo cp -a sinosoft /usr/local/cdcAsm/
 
 # 安装主程序到桌面
-cp "CDC Asm Client.desktop" ${HOME}/Desktop/
+cp "CDC Asm Client.desktop" /home/cdc/Desktop/
+cp "applet.desktop" /home/cdc/Desktop/

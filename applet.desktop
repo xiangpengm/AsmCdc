@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Terminal=false
+Name=applet
+Categories=Development
+Exec=java -jar /usr/local/cdcAsm/sinosoft/applet.jar
+Icon=/usr/local/cdcAsm/templates/image/cdc.png
