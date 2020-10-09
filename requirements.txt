@@ -42,7 +42,7 @@ pysubs2==0.2.3
 alipay-sdk-python==3.3.398
 python-dateutil==2.8.0
 pytz==2019.2
-qcloudsms-py==0.1.1
+qcloudsms-py==0.1.4
 qiniu==7.2.2
 redis==2.10.6
 requests==2.23.0
