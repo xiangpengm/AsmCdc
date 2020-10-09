@@ -48,7 +48,7 @@ redis==2.10.6
 requests==2.23.0
 sentinels==1.0.0
 sentry-sdk==0.16.1
-simplejson==3.16.0
+simplejson==3.17.2
 six==1.12.0
 text-unidecode==1.2
 uritemplate==3.0.0
