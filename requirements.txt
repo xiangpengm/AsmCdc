@@ -12,7 +12,7 @@ django-crontab==0.7.1
 django-ipware==2.1.0
 django-js-asset==1.2.2
 django-mptt==0.9.0
-django-redis==4.9.0
+django-redis==4.12.1
 django-rest-auth==0.9.3
 django-rest-framework-mongoengine==3.3.1
 django-rest-swagger==2.2.0
