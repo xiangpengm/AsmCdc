@@ -1,5 +1,5 @@
-amqp==2.5.0
-billiard==3.6.3.0
+amqp==5.0.1
+billiard==3.5.0.5
 celery==4.2.0
 certifi==2019.6.16
 chardet==3.0.4
@@ -28,7 +28,7 @@ Jinja2==2.10.1
 kombu==4.6.3
 lxml==4.2.3
 MarkupSafe==1.1.1
-mock==3.0.5
+mock==4.0.2
 mongoengine==0.16.2
 mongomock==3.10.0
 mysqlclient==2.0.1
