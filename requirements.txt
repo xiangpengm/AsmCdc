@@ -66,7 +66,7 @@ dicttoxml==1.7.4
 ConcurrentLogHandler==0.9.1
 JSON-log-formatter==0.3.0
 pandas==1.0.5
-xlrd==1.2.0
+xlrd==2.0.1
 gunicorn==20.0.4
 gevent==20.6.2
 fabric==2.5.0
