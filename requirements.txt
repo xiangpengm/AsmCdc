@@ -1,6 +1,6 @@
 amqp==5.0.1
 billiard==3.5.0.5
-celery==5.0.0
+celery==5.0.5
 certifi==2019.6.16
 chardet==3.0.4
 coreapi==2.3.3
