@@ -68,7 +68,7 @@ JSON-log-formatter==0.3.0
 pandas==1.0.5
 xlrd==1.2.0
 gunicorn==20.0.4
-gevent==20.6.2
+gevent==21.1.2
 fabric==2.5.0
 invoke==1.4.1
 pydantic==1.6.1
