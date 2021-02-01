@@ -24,7 +24,7 @@ Faker==2.0.0
 hiredis==0.2.0
 idna==2.7
 itypes==1.1.0
-Jinja2==2.10.1
+Jinja2==2.11.3
 kombu==4.6.3
 lxml==4.2.3
 MarkupSafe==1.1.1
