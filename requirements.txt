@@ -41,7 +41,7 @@ PyMySQL==0.8.1
 pysubs2==0.2.3
 alipay-sdk-python==3.3.398
 python-dateutil==2.8.0
-pytz==2019.2
+pytz==2021.1
 qcloudsms-py==0.1.1
 qiniu==7.2.2
 redis==2.10.6
