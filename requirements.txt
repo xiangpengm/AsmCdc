@@ -65,7 +65,7 @@ nose-htmloutput==0.6.0
 dicttoxml==1.7.4
 ConcurrentLogHandler==0.9.1
 JSON-log-formatter==0.3.0
-pandas==1.0.5
+pandas==1.2.3
 xlrd==1.2.0
 gunicorn==20.0.4
 gevent==20.6.2
